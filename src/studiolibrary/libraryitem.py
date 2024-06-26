@@ -12,6 +12,7 @@
 
 import os
 import shutil
+import subprocess
 import logging
 from functools import partial
 
@@ -654,7 +655,10 @@ class LibraryItem(studiolibrary.widgets.Item):
 
         self.save(*args, **kwargs)
 
-        shutil.move(tmp, dst)
+        try:
+            shutil.move(tmp, dst, copy_function=shutil.copyfile)
+        except:
+            pass
 
         self.setPath(dst)
         self.syncItemData()

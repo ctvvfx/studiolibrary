@@ -12,6 +12,7 @@
 
 import os
 import shutil
+import subprocess
 import logging
 
 from studiovendor.Qt import QtGui
@@ -127,7 +128,9 @@ class ThumbnailCaptureMenu(QtWidgets.QMenu):
         
         :type path: str
         """
-        shutil.copy(path, self.path())
+        # shutil.copy(path, self.path())
+        p = subprocess.Popen(["cp", path, self.path()])
+        p.wait()
         self.captured.emit(self.path())
 
 

@@ -17,6 +17,7 @@ import uuid
 import errno
 import ctypes
 import shutil
+import subprocess
 import locale
 import logging
 import getpass
@@ -613,9 +614,11 @@ def copyPath(src, dst, force=False):
         os.makedirs(dstDir)
 
     if os.path.isfile(src):
-        shutil.copy(src, dst)
+        #shutil.copy(src, dst)
+        p = subprocess.Popen(["cp", src, dst])
+        p.wait()
     else:
-        shutil.copytree(src, dst)
+        shutil.copytree(src, dst, copy_function=shutil.copyfile)
 
     logger.info("Copied path!")
 
@@ -640,7 +643,7 @@ def movePath(src, dst):
         dst = u'{0}/{1}{2}'.format(dst, name, extension)
         dst = generateUniquePath(dst)
 
-    shutil.move(src, dst)
+    shutil.move(src, dst, copy_function=shutil.copyfile)
     return dst
 
 
@@ -665,7 +668,7 @@ def movePaths(srcPaths, dst):
         dst_ = normPath(dst_)
 
         logger.info(u'Moving Content: {0} => {1}'.format(src, dst_))
-        shutil.move(src, dst_)
+        shutil.move(src, dst_, copy_function=shutil.copyfile)
         
 
 def silentRemove(filename):
@@ -743,6 +746,8 @@ def renamePath(src, dst, extension=None, force=False):
         raise RenamePathError(msg.format(src))
 
     os.rename(src, dst)
+    # subprocess.Popen(["mv",src, dst])
+    # print("rename path: {} {}".format(src, dst))
 
     logger.debug(u'Renamed: {0} => {1}'.format(src, dst))
 
@@ -810,6 +815,7 @@ def write(path, data):
 
         # Rename the tmp path to the given path
         if os.path.exists(tmp):
+            #subprocess.Popen(["mv", tmp, path])
             os.rename(tmp, path)
 
         # Clean up the bak file only if the given path exists
